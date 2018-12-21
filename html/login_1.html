@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Call Go</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$("#login").on('click', function() {
+					var rspname;
+					$.ajax({
+						type: "POST",
+			            url: "http://localhost/Verify",
+						data: {
+		                name: $("#uname").val()
+			            },
+						dataType: "json",
+						success: function(data) {
+							rspname = data.name
+							console.log(rspname );
+							document.getElementById('lblusername').innerHTML = rspname
+			        }
+					});
+				});
+				return rspname;
+			});
+		</script>
+	</head>
+	<body>
+        <form action="/Verify" method="post">
+            <input type="text" name="username" id="uname">
+            <input type="submit" value="Login">
+        </form>
+	</body>
+</html>
