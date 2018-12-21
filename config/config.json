@@ -1,0 +1,20 @@
+{
+	"config": {
+        "db": {
+			"address": "127.0.0.1",
+            "port": 3306,
+            "username": "root",
+            "password": "abc123",
+			"dbName": "dsmart",
+			"user": "user",
+			"token": "token",
+			"contact": "contact"
+        },
+		"log": {
+			"api":  true,
+			"db":   true,
+			"error": true,
+			"other":  true
+		}
+	}
+}
