@@ -77,6 +77,28 @@ func CreateContact(tok string, contact *cmn.Contact) (ret string) {
 	return
 }
 
+func GetContact(tok string) (cont cmn.Contact, ret string) {
+	Connect()
+
+	if cmn.IsError(err) {
+		return
+	}
+	defer db.Close()
+	ret = ""
+	id := IsTokenValid(tok)
+	if id == 0 {
+		ret = "INVALID TOKEN"
+		return
+	}
+	getContact := fmt.Sprintf("select * from %s where id=%d", dbCfg.Contact, id)
+	err := db.QueryRow(getContact).Scan(&id, &cont.First_name, &cont.Last_name, &cont.Organization, &cont.Phone_number, &cont.Email, &cont.Website)
+	if cmn.IsError(err) {
+		ret = "DB INTERNAL ERROR GET CONTACT FAIL"
+		return
+	}
+	return
+}
+
 func getColVal(valType string, i interface{}) (res string, yes bool) {
 	res = ""
 	yes = false
@@ -142,13 +164,15 @@ func EditContact(tok string, contact *cmn.Contact) (ret string) {
 
 	affect, err := res.RowsAffected()
 	if cmn.IsError(err) {
-		return "EDIT CONTACT GET NOOFROWS ERROR"
+		ret = "EDIT CONTACT GET NOOFROWS ERROR"
+		return
 	}
 
-	if affect != 1 {
-		ret = "INTERNAL DB ERROR MORE THAN ONE ROW AFFECTED"
+	if affect < 1 {
+		ret = "INTERNAL DB ERROR FOUND NO ROW TO EDIT"
 		cmn.Log(cmn.DB, ret)
-		return
+	} else if affect > 1 {
+		ret = "INTERNAL DB ERROR MORE THAN ONE ROW EDITED"
 	}
 	return
 }
@@ -182,10 +206,11 @@ func DeleteContact(tok string) (ret string) {
 		return "DELETE CONTACT GET NOOFROWS ERROR"
 	}
 
-	if affect != 1 {
-		ret = "INTERNAL DB ERROR MORE THAN ONE ROW AFFECTED"
+	if affect < 1 {
+		ret = "INTERNAL DB ERROR FOUND NO ROW TO DELETE"
 		cmn.Log(cmn.DB, ret)
-		return
+	} else if affect > 1 {
+		ret = "INTERNAL DB ERROR MORE THAN ONE ROW DELETED"
 	}
 	return
 }

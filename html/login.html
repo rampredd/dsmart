@@ -1,30 +1,220 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>Call Go</title>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-		<script type="text/javascript">
-			$(document).ready(function() {
-				$("#login").on('click', function() {
-					var rspname;
-					$.ajax({
-						type: "POST",
-			            url: "http://localhost/Verify",
-						dataType: "json",
-						data: {
-							name: $("#uname").val()
-						},
-					});
-				});
-				return rspname;
-			});
-		</script>
-	</head>
-	<body>
-        <form action="/Verify" method="post">
-            <input type="text" name="username" id="uname">
-            <input type="submit" value="Login">
-        </form>
-	</body>
+<head>
+<meta charset="utf-8">
+<title>Echo Example</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	var authcode;
+	$("#btnsubmit").on('click',function(){
+		var rspname;
+		var testval='Bearer:' + authcode;
+		if(document.getElementById('btnsubmit').innerHTML=="Save"){
+	  $.ajax({
+		type: "POST",
+		url: "http://localhost/CreateContact",
+		beforeSend: function (xhr) {
+	   // xhr.setRequestHeader('Authorization', 'Bearer:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXNzd29yZCI6InBhc3MyIiwidXNlcm5hbWUiOiJ1c2VyMiJ9.KwH_kIgPuniGjYchi-XiNTL5zVJn5gzwgLYQrSnihX4');
+	 xhr.setRequestHeader('Authorization',testval);
+		},
+		data: {
+			first_name: $("#fname").val(),
+			last_name: $("#lname").val(),
+			organization: $("#orgname").val(),
+			phone_number: $("#phonenumber").val(),
+			email: $("#email").val(),
+			website: $("#website").val()
+		},
+		dataType: "json",
+		success: function(data) {
+			document.getElementById('dvcreate').style.display="block";
+			document.getElementById('CContact').style.display="none";
+			document.getElementById('dvlogin').style.display="none";
+			document.getElementById('lbluname').innerHTML = "Contact Created Successfully.";
+			document.getElementById('createcontactfail').innerHTML ="";
+		},
+		error:function(data){
+			console.log(data.responseJSON)
+			document.getElementById('createcontactfail').innerHTML =data.responseJSON;
+		}
+		
+	});}
+	    else{
+		$.ajax({
+		type: "PATCH",
+		url: "http://localhost/EditContact",
+		beforeSend: function (xhr) {
+	   // xhr.setRequestHeader('Authorization', 'Bearer:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXNzd29yZCI6InBhc3MyIiwidXNlcm5hbWUiOiJ1c2VyMiJ9.KwH_kIgPuniGjYchi-XiNTL5zVJn5gzwgLYQrSnihX4');
+	 xhr.setRequestHeader('Authorization',testval);
+		},
+		data: {
+			first_name: $("#fname").val(),
+			last_name: $("#lname").val(),
+			organization: $("#orgname").val(),
+			phone_number: $("#phonenumber").val(),
+			email: $("#email").val(),
+			website: $("#website").val()
+		},
+		dataType: "json",
+		success: function(data) {
+			document.getElementById('dvcreate').style.display="block";
+			document.getElementById('CContact').style.display="none";
+			document.getElementById('dvlogin').style.display="none";
+		    document.getElementById('lbluname').innerHTML = "Contact Updated Successfully.";
+		},
+		error:function(data){
+			document.getElementById('createcontactfail').innerHTML =data.responseJSON;
+		}
+		
+	});
+	}
+		});
+	$("#Editcontact").on('click',function(){
+		var testval='Bearer:' + authcode;
+		document.getElementById('dvcreate').style.display="none";
+		document.getElementById('CContact').style.display="block";
+		document.getElementById('btnsubmit').innerHTML ="Update";
+		$.ajax({
+			type: "GET",
+			url: "http://localhost/GetContact",
+			beforeSend: function (xhr) {
+			 xhr.setRequestHeader('Authorization',testval);
+			},
+		data: {
+			  },
+		dataType: "json",
+		success: function(data) {
+			$("#fname").val(data.first_name);
+			$("#lname").val(data.last_name);
+			$("#orgname").val(data.organization);
+			$("#phonenumber").val(data.phone_number);
+			$("#email").val(data.email);
+			$("#website").val(data.website);
+			document.getElementById('dvlogin').style.display="none";
+			document.getElementById('dvcreate').style.display="block";
+			
+		},
+		error:function(data){
+			document.getElementById('createcontactfail').innerHTML =data.responseJSON;
+		}
+		});
+	});
+	$("#btnCancel").on('click',function(){
+		document.getElementById('dvcreate').style.display="block";
+		document.getElementById('CContact').style.display="none";
+	});
+	$("#login").on('click', function() {
+		var rspname;
+		$.ajax({
+		type: "POST",
+		url: "http://localhost/Verify",
+		data: {
+			username: $("#uname").val(),
+			password: $("#pwd").val()
+		},
+		dataType: "json",
+		success: function(data) {
+		authcode =data.auth_token;
+		document.getElementById('dvlogin').style.display="none";
+		document.getElementById('dvcreate').style.display="block";
+		//document.getElementById('lbluname').innerHTML = data;
+		},
+		error:function( data){
+			document.getElementById('lblfailureresponse').innerHTML =data.responseJSON;
+		}
+		});
+	});
+    $("#createcontact").on('click',function(){
+			document.getElementById('dvcreate').style.display="none";
+			document.getElementById('CContact').style.display="block";
+			document.getElementById('dvlogin').style.display="none";
+			document.getElementById('btnsubmit').innerHTML ="Save";
+			document.getElementById('createcontactfail').innerHTML ="";
+			document.getElementById('fname').value ="";
+			document.getElementById('lname').value ="";
+			document.getElementById('orgname').value ="";
+			document.getElementById('phonenumber').value ="";
+			document.getElementById('email').value ="";
+			document.getElementById('website').value ="";
+		});
+     $("#Deletecontact").on('click',function(){
+		var testval='Bearer:' + authcode;
+		document.getElementById('dvcreate').style.display="block";
+		document.getElementById('CContact').style.display="none";
+		$.ajax({
+			type: "DELETE",
+			url: "http://localhost/DeleteContact",
+			beforeSend: function (xhr) {
+			 xhr.setRequestHeader('Authorization',testval);
+			},
+		data: {
+			  },
+		dataType: "json",
+		success: function(data) {
+			document.getElementById('lbluname').innerHTML ="Contact deleted successfully.";
+			
+		},
+		error:function(data){
+			document.getElementById('lbluname').innerHTML =data.responseJSON;
+		}
+		});
+	});
+});
+</script>
+</head>
+<body>
+<div id="dvlogin">
+<input type="text" name="username" id="uname">
+<input type="password" name="password" id="pwd">
+<button id="login" type="">Login</button>
+<lable id="lblfailureresponse" ></lable>
+</div>
+<div id="dvcreate" style="display:none">
+<button id="createcontact" type="">Create Contact</button>
+<button id="Editcontact" type="">Edit Contact</button>
+<button id="Deletecontact" type="">Delete Contact</button>
+<label id="lbluname"></label>
+</div>
+<div id="CContact" style="display:none">
+<table>
+<tr>
+<td>First Name</td>
+<td><input id="fname" type="text"/></td>
+</tr>
+<tr>
+<td>Last Name</td>
+<td><input id="lname" type="text" /></td>
+</tr>
+<tr>
+<td>Organization</td>
+<td><input id="orgname" type="text" /></td>
+</tr>
+<tr>
+<td>Phone Number</td>
+<td><input id="phonenumber" type="text" /></td>
+</tr>
+<tr>
+<td>Email</td>
+<td><input id="email" type="text" /></td>
+</tr>
+<tr>
+<td>Web Site</td>
+<td><input id="website" type="text" /></td>
+</tr>
+<!-- <tr>
+<td><button id="btnsubmit">Save</button></td>
+<td><button id="btnCancel"/>Cancel</td>
+</tr> -->
+</table>
+<table><tr>
+<td style="padding-left:100px;width:70px;"><button id="btnsubmit">Submit</button></td>
+<td><button id="btnCancel"/>Cancel</td>
+</tr>
+<tr>
+<td colspan="2"><lable id="createcontactfail" ></lable></td>
+</tr>
+</table>
+</div>
+</body>
 </html>

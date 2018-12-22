@@ -58,10 +58,14 @@ var (
 )
 
 const (
-	API   = 1
-	DB    = 2
-	ERROR = 3
-	OTHER = 50
+	API                 = 1
+	DB                  = 2
+	ERROR               = 3
+	OTHER               = 50
+	EMPTY_TOKEN         = "BEARER TOKEN IS EMPTY"
+	BIND_ERROR          = "DATA BIND ERROR"
+	FILE_ERROR          = "CANNOT LOAD HTML FILE"
+	INVALID_CREDENTIALS = "INVALID CREDENTIALS"
 )
 
 func Log(who int, args ...interface{}) {
